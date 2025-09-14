@@ -1,4 +1,5 @@
 @media (max-width: 480px) {
+
   /* App Header (Logo + Search) */
   .app-header {
     width: 100%;
@@ -44,7 +45,8 @@
 
   /* Location info row */
   .location-info {
-    order: 1;                   /* पहले दिखे */
+    order: 1;
+    /* पहले दिखे */
     flex-direction: row;
     justify-content: center;
     align-items: center;
@@ -94,8 +96,17 @@
     padding: 16px 12px;
     background: rgba(0, 0, 0, 0.35);
     border: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px) saturate(120%) brightness(1.1);
     -webkit-backdrop-filter: blur(10px) saturate(120%) brightness(1.1);
   }
+}
+
+button {
+  padding: 20px;
+   align-items: center;
+  background-color: rgba(0, 0, 0, 0.158);
+  color: white;
+  border: none;
+   font-family: sans-serif;
 }

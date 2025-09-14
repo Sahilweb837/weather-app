@@ -1,19 +1,58 @@
- import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
-import useWeather from "./useWeather"; // make sure path is correct
-import { getWeatherIcon, statIcons } from "./icons"; // make sure path is correct
+import useWeather from "./useWeather";
+import { getWeatherIcon, statIcons } from "./icons";
 import "./WeatherApp.css";
 
 export default function WeatherApp() {
   const { weatherData, forecastData, loading, error, fetchWeatherData } = useWeather();
   const [searchCity, setSearchCity] = useState("");
+  const [unit, setUnit] = useState("metric");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (weatherData?.name) {
+        fetchWeatherData(weatherData.name, unit);
+      }
+    }, 300000);
+    return () => clearInterval(interval);
+  }, [weatherData, unit, fetchWeatherData]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchCity.trim()) {
-      fetchWeatherData(searchCity.trim());
+      fetchWeatherData(searchCity.trim(), unit);
       setSearchCity("");
     }
+  };
+
+  const handleRefresh = () => {
+    if (weatherData?.name) {
+      fetchWeatherData(weatherData.name, unit);
+    }
+  };
+
+  const toggleUnit = () => {
+    setUnit((prev) => (prev === "metric" ? "imperial" : "metric"));
+    if (weatherData?.name) {
+      fetchWeatherData(weatherData.name, unit === "metric" ? "imperial" : "metric");
+    }
+  };
+
+  const handleTodayWeather = () => {
+    if (weatherData?.name) {
+      fetchWeatherData(weatherData.name, unit, "today");
+    }
+  };
+
+  const handleFiveDayForecast = () => {
+    if (weatherData?.name) {
+      fetchWeatherData(weatherData.name, unit, "forecast");
+    }
+  };
+
+  const handleCityClick = (city) => {
+    fetchWeatherData(city, unit);
   };
 
   return (
@@ -24,7 +63,7 @@ export default function WeatherApp() {
         </div>
       </div>
 
-      {error && <div className="error-message"><p>⚠️ {error}</p></div>}
+      {error && <div className="error-message"><h1>⚠️ {error}</h1></div>}
       {loading && (
         <div className="loading-spinner">
           <div className="spinner"></div>
@@ -33,13 +72,12 @@ export default function WeatherApp() {
       )}
 
       <div className="weather-content">
-        {/* Current Weather */}
         <div className="weather-overview">
           {weatherData ? (
             <div className="location-info">
               <div className="current-temp">
                 {weatherData.main ? Math.round(weatherData.main.temp) : "--"}
-                <span className="degree-symbol">°</span>
+                <span className="degree-symbol">°{unit === "metric" ? "C" : "F"}</span>
               </div>
               <div className="city-name">
                 {weatherData.name || "Unknown City"}
@@ -71,9 +109,8 @@ export default function WeatherApp() {
           )}
         </div>
 
-        {/* Details + Forecast */}
         <div className="weather-details">
-          {/* Search Box */}
+          {/* 🔎 Search Box */}
           <div className="search-container">
             <form onSubmit={handleSearch} className="search-form">
               <div className="search-box">
@@ -90,9 +127,16 @@ export default function WeatherApp() {
               </div>
             </form>
           </div>
+
+          <div className="quick-city-buttons">
+            <button onClick={() => handleCityClick("Delhi")}>Delhi</button>
+            <button onClick={() => handleCityClick("Mumbai")}>Mumbai</button>
+            <button onClick={() => handleCityClick("Chandigarh")}>Chandigarh</button>
+            <button onClick={() => handleCityClick("Mohali")}> Mohali</button>
+          </div>
+
           <hr />
 
-          {/* WEATHER DETAILS */}
           {weatherData?.main && (
             <>
               <div className="details-title">Weather Details...</div>
@@ -112,7 +156,6 @@ export default function WeatherApp() {
             </>
           )}
 
-          {/* FORECAST */}
           {forecastData?.list && (
             <div className="forecast-container">
               <div className="forecast-items">
@@ -133,6 +176,16 @@ export default function WeatherApp() {
               </div>
             </div>
           )}
+
+          {/* ✅ Extra Action Buttons */}
+          <div className="extra-buttons">
+            <button onClick={handleRefresh} className="refresh-btn">🔄 Refresh</button>
+            <button onClick={toggleUnit} className="unit-btn">
+              Switch to {unit === "metric" ? "°F" : "°C"}
+            </button>
+            <button onClick={handleTodayWeather} className="today-btn">🌤 Today</button>
+            <button onClick={handleFiveDayForecast} className="forecast-btn">📅 5-Day Forecast</button>
+          </div>
         </div>
       </div>
     </div>
